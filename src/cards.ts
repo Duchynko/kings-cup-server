@@ -1,3 +1,4 @@
+// tslint:disable-next-line: import-name
 import _ from 'lodash';
 
 const colors = ['♥️', '♦️', '♠️', '♣️'];
@@ -78,30 +79,30 @@ const cards = [
   },
 ];
 
-const deck = [].concat(
-  ...colors.map((color) => {
-    return cards.map((card) => ({
+const deck = _.concat(
+  colors.map((color) => {
+    return cards.map(card => ({
+      color,
       symbol: card.symbol,
       name: card.name,
       description: card.description,
-      color: color,
     }));
-  })
+  }),
 );
 
-export function getDeck() {
+export function getDeck(): any[] {
   return _.cloneDeep(deck);
 }
 
-export function getNextCardFrom(deck) {
+export function getNextCardFrom(deck: any) {
   if (deck.length < 1) return;
 
   const index = Math.floor(Math.random() * Math.floor(deck.length));
   const nextCard = _.cloneDeep(deck[index]);
   const deletedCard = deck.splice(index, 1);
 
-  if (nextCard === deletedCard[0] && nextCard != deletedCard[0]) {
-    console.log('Seems like a wrong card was deleted');
+  if (nextCard === deletedCard[0] && nextCard !== deletedCard[0]) {
+    console.log('Seems like a wrong card was deleted'); // TODO: Remove later
   }
 
   return nextCard;

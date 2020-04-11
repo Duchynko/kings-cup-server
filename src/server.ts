@@ -1,13 +1,13 @@
-import Express from 'express';
-import HTTP from 'http';
-import Socket from 'socket.io';
+import express from 'express';
+import http from 'http';
+import socketIo from 'socket.io';
 import cors from 'cors';
 import { json } from 'body-parser';
-import { getDeck, getNextCardFrom } from './card';
+import { getDeck, getNextCardFrom } from './cards';
 
-const app = Express();
-const http = HTTP.Server(app);
-const io = Socket(http);
+const app = express();
+const httpServer = new http.Server(app);
+const io = socketIo(httpServer);
 
 app.use(cors());
 app.use(json());
@@ -35,7 +35,7 @@ app.post('/user', (req, res) => {
 // Game state
 
 const rooms = [];
-const players = [];
+const players: any[] = [];
 const currentDeck = getDeck();
 let nextCard = getNextCardFrom(currentDeck);
 
@@ -65,6 +65,6 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 
-http.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
