@@ -1,5 +1,16 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faUser,
+  faChessRook,
+  faUserAstronaut
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Vue from 'vue';
 import routes from './routes';
+
+library.add(faUser, faChessRook, faUserAstronaut);
+
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 const app = new Vue({
   el: '#app',
