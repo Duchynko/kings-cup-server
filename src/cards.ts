@@ -1,5 +1,17 @@
-// tslint:disable-next-line: import-name
 import _ from 'lodash';
+import { Deck, Maybe } from './types';
+
+export interface Card {
+  symbol: string;
+  name: string;
+  description: string;
+}
+
+export const welcomeCard = {
+  name: "Welcome to King's Cup online",
+  description: 'Click here to lick a next card',
+  symbol: '👑',
+};
 
 const colors = ['♥️', '♦️', '♠️', '♣️'];
 
@@ -79,31 +91,27 @@ const cards = [
   },
 ];
 
-const deck = _.concat(
+const deck = _.flatten(
   colors.map((color) => {
-    return cards.map(card => ({
+    return cards.map((card) => ({
       color,
       symbol: card.symbol,
       name: card.name,
       description: card.description,
     }));
-  }),
+  })
 );
 
-export function getDeck(): any[] {
-  return _.cloneDeep(deck);
+export function getDeck(): Deck {
+  return _.clone(deck);
 }
 
-export function getNextCardFrom(deck: any) {
+export function getNextCardFrom(deck: Deck): Maybe<Card> {
   if (deck.length < 1) return;
 
   const index = Math.floor(Math.random() * Math.floor(deck.length));
-  const nextCard = _.cloneDeep(deck[index]);
-  const deletedCard = deck.splice(index, 1);
-
-  if (nextCard === deletedCard[0] && nextCard !== deletedCard[0]) {
-    console.log('Seems like a wrong card was deleted'); // TODO: Remove later
-  }
+  const nextCard = _.clone(deck[index]);
+  deck.splice(index, 1);
 
   return nextCard;
 }

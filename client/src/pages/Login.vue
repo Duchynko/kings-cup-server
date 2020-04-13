@@ -1,12 +1,12 @@
 <template>
-  <div class="body">
-    <div class="login-page">
+  <div class="login-page-container">
+    <div class="form-container">
       <div class="form">
-        <form class="login-form" @submit="submit">
+        <form class="login-form" @submit.prevent="submit">
           <input type="text" placeholder="Name" v-model="name" />
-          <input type="text" placeholder="Room" />
+          <input type="text" placeholder="Room" v-model="room" />
           <input type="text" placeholder="Avatar" v-model="logo" />
-          <button onclick="window.location.href = '/game'">login</button>
+          <button>join</button>
         </form>
       </div>
     </div>
@@ -15,33 +15,56 @@
 
 <script>
 import axios from 'axios';
+import routes from '../routes';
 export default {
   name: 'Login',
   data() {
     return {
       name: '',
       logo: '',
+      room: ''
     };
   },
   methods: {
     async submit(e) {
       e.preventDefault();
-      const res = await axios.post('http://localhost:3000/user', {
+      const res = await axios.post('http://localhost:3000/join', {
         user: {
           name: this.name,
-          logo: this.logo,
+          logo: this.logo
         },
+        roomName: this.room
       });
-      console.log(res);
-    },
-  },
+
+      if (res.status === 200) {
+        sessionStorage.setItem(
+          'context',
+          JSON.stringify({
+            name: this.name,
+            number: res.data.number,
+            logo: this.logo,
+            room: this.room
+          })
+        );
+
+        this.$root.currentRoute = '/game';
+        window.history.pushState(null, routes['/game'], '/game');
+      }
+    }
+  }
 };
 </script>
 
-<style lang="less" scoped>
+<style>
+body {
+  margin: 0;
+}
+</style>
+
+<style scoped>
 @import url(https://fonts.googleapis.com/css?family=Roboto:300&.css);
 
-.login-page {
+.form-container {
   width: 360px;
   padding: 8% 0 0;
   margin: auto;
@@ -86,50 +109,8 @@ export default {
 .form button:focus {
   background: #43a047;
 }
-.form .message {
-  margin: 15px 0 0;
-  color: #b3b3b3;
-  font-size: 12px;
-}
-.form .message a {
-  color: #4caf50;
-  text-decoration: none;
-}
-.container {
-  position: relative;
-  z-index: 1;
-  max-width: 300px;
-  margin: 0 auto;
-}
-.container:before,
-.container:after {
-  content: '';
-  display: block;
-  clear: both;
-}
-.container .info {
-  margin: 50px auto;
-  text-align: center;
-}
-.container .info h1 {
-  margin: 0 0 15px;
-  padding: 0;
-  font-size: 36px;
-  font-weight: 300;
-  color: #1a1a1a;
-}
-.container .info span {
-  color: #4d4d4d;
-  font-size: 12px;
-}
-.container .info span a {
-  color: #000000;
-  text-decoration: none;
-}
-.container .info span .fa {
-  color: #ef3b3a;
-}
-.body {
+
+.login-page-container {
   width: 100%;
   height: 100vh;
   background: #76b852; /* fallback for old browsers */

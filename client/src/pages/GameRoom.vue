@@ -6,7 +6,7 @@
       v-bind:key="index"
       v-bind:player="player"
     />
-    <Deck ref="deck" v-bind:card="context.card" v-on:next-card="getCard" />
+    <Deck ref="deck" v-bind:card="card" v-on:next-card="getCard" />
   </div>
 </template>
 
@@ -19,36 +19,41 @@ export default {
   name: 'GameRoom',
   components: {
     Player,
-    Deck,
+    Deck
   },
   data() {
     return {
       socket: {},
-      context: {
-        card: {},
-      },
+      // context: { name, number, logo, room }
+      context: {},
       players: [],
+      card: {}
     };
   },
   created() {
     this.socket = io('http://localhost:3000/');
+    this.context = JSON.parse(sessionStorage.getItem('context'));
+    this.socket.emit('subscribe', this.context.room);
+    console.log('Player joined the room');
   },
   mounted() {
-    this.socket.on('update', (data) => {
-      console.log('UPDATING');
-      this.update(data);
+    this.socket.on('player-joined', data => {
+      console.log('on player-joined called with:', data);
+      this.players = data.players;
+      this.card = data.card;
+    });
+
+    this.socket.on('update', data => {
+      console.log('on update called with:', data);
+      this.players = data.players;
+      this.card = data.card;
     });
   },
   methods: {
-    update(data) {
-      this.players = data.players;
-      this.context.card = data.card;
-      this.$forceUpdate();
-    },
     getCard() {
-      this.socket.emit('new-card');
-    },
-  },
+      this.socket.emit('new-card', this.context.room);
+    }
+  }
 };
 </script>
 
@@ -64,6 +69,6 @@ body {
   height: 100vh;
   grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
   grid-template-rows: 20% 20% 20% 20% 20%;
-  background-color: aquamarine;
+  background-color: #76b852;
 }
 </style>
