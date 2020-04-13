@@ -6,7 +6,7 @@
         <img v-bind:src="require('@/assets/images/drinking.svg')" />
       </div>
       <div class="login-content">
-        <form action="index.html">
+        <form action="index.html" @submit="submit">
           <img v-bind:src="require('@/assets/images/cards.svg')" />
           <h2 class="title">King's Cup Online</h2>
           <div class="input-div one">
@@ -15,7 +15,13 @@
             </div>
             <div class="div">
               <h5>Username</h5>
-              <input type="text" class="input" :model="name" />
+              <input
+                type="text"
+                class="input"
+                @focus="addFocus"
+                @blur="removeFocus"
+                v-model="name"
+              />
             </div>
           </div>
           <div class="input-div one">
@@ -24,7 +30,13 @@
             </div>
             <div class="div">
               <h5>Room</h5>
-              <input type="text" class="input" :model="room" />
+              <input
+                type="text"
+                class="input"
+                @focus="addFocus"
+                @blur="removeFocus"
+                v-model="room"
+              />
             </div>
           </div>
           <div class="input-div one">
@@ -36,7 +48,13 @@
             </div>
             <div class="div">
               <h5>Avatar</h5>
-              <input type="text" class="input" :model="logo" />
+              <input
+                type="text"
+                class="input"
+                @focus="addFocus"
+                @blur="removeFocus"
+                v-model="logo"
+              />
             </div>
           </div>
           <a href="#">Read the rules</a>
@@ -54,12 +72,20 @@ export default {
   name: 'Login',
   data() {
     return {
-      name: '',
-      logo: '',
-      room: ''
+      name: null,
+      logo: null,
+      room: null
     };
   },
   methods: {
+    addFocus(event) {
+      event.target.parentNode.parentNode.classList.add('focus');
+    },
+    removeFocus(event) {
+      if (event.target.value === '') {
+        event.target.parentNode.parentNode.classList.remove('focus');
+      }
+    },
     async submit(e) {
       e.preventDefault();
       const res = await axios.post('http://localhost:3000/join', {
