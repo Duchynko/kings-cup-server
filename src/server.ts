@@ -52,13 +52,12 @@ io.on('connect', (socket) => {
   console.log('Socket connected');
 
   // On subscribe
-  socket.on('subscribe', (roomName: string) => {
-    socket.join(roomName);
+  socket.on('subscribe', (data) => {
+    socket.join(data.roomName);
 
-    const response = onSubscribe(roomName, rooms);
+    const response = onSubscribe(socket, data, rooms);
 
-    io.to(roomName).emit('player-joined', response);
-    console.log('player-joined emited with:', response);
+    io.to(data.roomName).emit('player-joined', response);
   });
 
   // On new-card
@@ -70,7 +69,7 @@ io.on('connect', (socket) => {
   });
 
   // On disconnect
-  socket.on('disconnect', () => {
+  socket.on('disconnecting', () => {
     const leftRooms = onDisconnect(socket, rooms);
 
     leftRooms.forEach((room) => {

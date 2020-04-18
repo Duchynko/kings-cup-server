@@ -1,8 +1,11 @@
 import { Room } from './room';
 import { Socket } from 'socket.io';
 
-export const onSubscribe = (roomName: string, rooms: Room[]): any => {
-  const room = rooms.find((r) => r.name === roomName);
+export const onSubscribe = (socket: Socket, data: any, rooms: Room[]): any => {
+  const room = rooms.find((r) => r.name === data.roomName);
+
+  const player = room?.players.find((p) => p.number === data.playerNumber);
+  if (player) player.socketId = socket.id;
 
   return {
     players: room?.players,
