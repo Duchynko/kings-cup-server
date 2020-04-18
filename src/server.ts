@@ -18,19 +18,18 @@ app.use(json());
 const rooms: Room[] = [];
 
 // Routes
-app.post('/join', (req, res) => {
+app.post('/join', async (req, res) => {
   const { user, roomName } = req.body;
   const player: Player = user;
   let room = rooms.find((r) => r.name === roomName);
 
   // If room doesn't exist and is empty, create a new room
   if (room === undefined) {
-    console.log('Creating new room', roomName);
     room = new Room(roomName);
     rooms.push(room);
   }
 
-  const playersInRoom = nOfPlayersInRoom(roomName, io);
+  const playersInRoom = await nOfPlayersInRoom(roomName, io);
 
   // Check if the room is full
   if (playersInRoom > 7) {
@@ -41,16 +40,11 @@ app.post('/join', (req, res) => {
   player.number = room.players.length + 1;
   room.addPlayer(player);
 
-  res.status(200).send({
-    player,
-    cards: room.deck,
-  });
+  res.status(200).send(player);
 });
 
 // Socket
 io.on('connect', (socket) => {
-  console.log('Socket connected');
-
   // On subscribe
   socket.on('subscribe', (data) => {
     socket.join(data.roomName);
@@ -65,7 +59,6 @@ io.on('connect', (socket) => {
     const response = onNewCard(roomName, rooms);
 
     io.to(roomName).emit('update', response);
-    console.log('updated emited with:', response);
   });
 
   // On disconnect
@@ -74,7 +67,6 @@ io.on('connect', (socket) => {
 
     leftRooms.forEach((room) => {
       io.to(room.name).emit('player-left', room.players);
-      console.log(`player-left emited for ${room}: ${room.players}`);
     });
   });
 });
@@ -82,5 +74,5 @@ io.on('connect', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on a port ${PORT}`);
 });

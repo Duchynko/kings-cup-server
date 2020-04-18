@@ -8,14 +8,14 @@ export interface Player {
   room: string;
 }
 
-export const nOfPlayersInRoom = (room: string, io: Server.Server): number => {
-  let players = 0;
-
-  io.in(room).clients((err: Error, clients: any[]) => {
-    if (err) throw err;
-    console.log('CL', clients.length);
-    players = clients.length;
+export const nOfPlayersInRoom = (
+  room: string,
+  io: Server.Server
+): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    io.in(room).clients((err: Error, clients: any[]) => {
+      if (err) throw err;
+      resolve(clients.length);
+    });
   });
-
-  return players;
 };
