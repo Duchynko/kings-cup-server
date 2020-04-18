@@ -5,8 +5,5 @@
     "prettier": true,
     "import-name": false
   },
-  "linterOptions": {
-    "exclude": ["client"]
-  },
   "rulesDirectory": []
 }

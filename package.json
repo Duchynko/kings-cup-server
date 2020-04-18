@@ -4,9 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --exec babel-node server.js",
+    "start": "server.js",
+    "dev": "nodemon ./src/server.ts",
     "test": "jest",
-    "dev": "nodemon ./src/server.ts"
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
