@@ -1,5 +1,5 @@
-import { Room } from './room';
 import { Socket } from 'socket.io';
+import { deleteEmptyRoomFrom, Room } from './room';
 
 export const onSubscribe = (socket: Socket, data: any, rooms: Room[]): any => {
   const room = rooms.find((r) => r.name === data.roomName);
@@ -22,16 +22,19 @@ export const onNewCard = (roomName: string, rooms: Room[]) => {
   };
 };
 
-export const onDisconnect = (socket: Socket, rooms: Room[]) => {
-  const leftRooms = Object.keys(socket.rooms);
+export const onDisconnect = (socket: Socket, listOfActiveRooms: Room[]) => {
+  const socketRooms = Object.keys(socket.rooms);
 
-  const matchedRooms = rooms.filter((room) =>
-    leftRooms.some((leftRoom) => leftRoom === room.name)
+  const leftRooms = listOfActiveRooms.filter((room) =>
+    socketRooms.some((leftRoom) => leftRoom === room.name)
   );
 
-  matchedRooms.forEach((room) => {
+  leftRooms.forEach((room) => {
     room.removePlayer(socket.id);
+
+    // Also remove a room if it's empty
+    deleteEmptyRoomFrom(room, listOfActiveRooms);
   });
 
-  return matchedRooms;
+  return leftRooms;
 };

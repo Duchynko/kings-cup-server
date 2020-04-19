@@ -40,3 +40,10 @@ export class Room {
     return this.playerIncrement;
   }
 }
+
+export const deleteEmptyRoomFrom = (room: Room, allRooms: Room[]) => {
+  if (room.players.length === 0) {
+    const index = allRooms.indexOf(room);
+    allRooms.splice(index, 1);
+  }
+};

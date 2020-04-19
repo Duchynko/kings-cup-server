@@ -1,4 +1,4 @@
-import { Room } from '../room';
+import { Room, deleteEmptyRoomFrom } from '../room';
 import { welcomeCard } from '../cards';
 import { Player } from '../player';
 
@@ -100,5 +100,18 @@ describe('testing room functions', () => {
     expect(nextCard === room.currentCard).toBe(true);
     expect(nextCard).toBeTruthy();
     expect(room.deck.length).toBe(51);
+  });
+
+  it('removes a room from a list of rooms', () => {
+    const room1 = new Room('alpha');
+    const room2 = new Room('beta');
+    const room3 = new Room('gama');
+    let rooms = [room1, room2, room3];
+
+    deleteEmptyRoomFrom(room2, rooms);
+
+    expect(rooms.length).toBe(2);
+    expect(rooms[0].name).toBe('alpha');
+    expect(rooms[1].name).toBe('gama');
   });
 });

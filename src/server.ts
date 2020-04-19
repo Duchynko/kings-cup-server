@@ -3,7 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import Server from 'socket.io';
-import { onNewCard, onSubscribe, onDisconnect } from './events';
+import { onDisconnect, onNewCard, onSubscribe } from './events';
 import { nOfPlayersInRoom, Player } from './player';
 import { Room } from './room';
 
@@ -15,18 +15,18 @@ app.use(cors());
 app.use(json());
 
 // Game state
-const rooms: Room[] = [];
+const listOfActiveRooms: Room[] = [];
 
 // Routes
 app.post('/join', async (req, res) => {
   const { user, roomName } = req.body;
   const player: Player = user;
-  let room = rooms.find((r) => r.name === roomName);
+  let room = listOfActiveRooms.find((r) => r.name === roomName);
 
   // If room doesn't exist and is empty, create a new room
   if (room === undefined) {
     room = new Room(roomName);
-    rooms.push(room);
+    listOfActiveRooms.push(room);
   }
 
   const playersInRoom = await nOfPlayersInRoom(roomName, io);
@@ -49,21 +49,21 @@ io.on('connect', (socket) => {
   socket.on('subscribe', (data) => {
     socket.join(data.roomName);
 
-    const response = onSubscribe(socket, data, rooms);
+    const response = onSubscribe(socket, data, listOfActiveRooms);
 
     io.to(data.roomName).emit('player-joined', response);
   });
 
   // On new-card
   socket.on('new-card', (roomName) => {
-    const response = onNewCard(roomName, rooms);
+    const response = onNewCard(roomName, listOfActiveRooms);
 
     io.to(roomName).emit('update', response);
   });
 
   // On disconnect
   socket.on('disconnecting', () => {
-    const leftRooms = onDisconnect(socket, rooms);
+    const leftRooms = onDisconnect(socket, listOfActiveRooms);
 
     leftRooms.forEach((room) => {
       io.to(room.name).emit('player-left', room.players);
